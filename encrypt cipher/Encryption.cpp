@@ -1,9 +1,9 @@
 #include "Encryption.h"
 #include <fstream>
-#include <cctype>
-#include <conio.h>
-#include <iostream>
 #include <vector>
+#include <random>
+#include <string>
+
 
 
 bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
@@ -61,7 +61,9 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
 Encryption::Encryption()
 {
     key = (unsigned char*)"01234567890123456789012345678901"; // A 256 bit key 32 bytes
-    iv = (unsigned char*)"0123456789012345";                 // A 128 bit IV  16 bytes
+
+    iv = Random16Bit();     // A 128 bit IV  16 bytes
+
 }
 
 int Encryption::encrypt(unsigned char* plaintData, unsigned char* cipherData, int plainData_len)
@@ -182,6 +184,29 @@ void Encryption::setKey(unsigned char* _key)
     key = _key;
 }
 
+void Encryption::setIV(unsigned char* _iv)
+{
+    iv = _iv;
+}
+
 Encryption::~Encryption()
 {
+}
+
+unsigned char* Encryption::Random16Bit()
+{
+    srand(time(0));
+    unsigned long long number;
+
+    // Ensure most significant digit is not 0
+    number = rand() % 9 + 1;
+
+    // Add 15 more digits (which can also be 0)
+    for (unsigned int i = 0; i < 15; i++)
+    {
+        number *= 10;
+        number += rand() % 10;
+    }
+
+    return (unsigned char*)std::to_string(number).c_str();
 }

@@ -30,7 +30,11 @@ public:
 	void print_ciphertext(unsigned char* ciphertext, int ciphertext_len);
 
 	void setKey(unsigned char* _key);
+	void setIV(unsigned char* _iv);
 	~Encryption();
+
+private:
+	unsigned char* Random16Bit();
 
 private:
 	unsigned char* key;
