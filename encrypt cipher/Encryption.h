@@ -4,7 +4,6 @@
 #include <iomanip>
 #include <string>
 #include <memory>
-#include <list>
 
 #include <string.h>
 #include <sstream>
