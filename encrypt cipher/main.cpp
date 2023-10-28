@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <stdlib.h> 
+
 #include "Encryption.h"
 
 int main()
@@ -28,6 +30,7 @@ int main()
 		std::cout << "Enter Password: ";
 		std::getline(std::cin, key);
 		std::cout << std::endl;
+		system("cls");
 
 		enObject.setKey((unsigned char*)key.c_str());
 
