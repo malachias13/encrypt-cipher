@@ -1,5 +1,5 @@
 # Encrypt-cipher
-encrypt-cipher is a console app that encrypts and decrypts files. encrypt-cipher utilizes AES encryption and decryption with OpenSSL.
+encrypt-cipher is a console app that encrypts and decrypts files. encrypt-cipher utilizes AES encryption and decryption with OpenSSL. Use at your own discretion.
 
 ## Image file
 https://github.com/malachias13/encrypt-cipher/assets/69220988/5252ed77-b28e-45fc-a141-ca282120d091
