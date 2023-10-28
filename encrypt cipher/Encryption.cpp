@@ -61,8 +61,9 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
 Encryption::Encryption()
 {
     key = (unsigned char*)"01234567890123456789012345678901"; // A 256 bit key 32 bytes
+    iv = (unsigned char*)"0269872681772902";
 
-    iv = Random16Bit();     // A 128 bit IV  16 bytes
+    //iv = Random16Bit();     // A 128 bit IV  16 bytes
 
 }
 
