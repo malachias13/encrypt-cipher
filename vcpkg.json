@@ -1,0 +1,5 @@
+{
+  "name": "packages",
+  "version-string": "1.0",
+  "dependencies": [ "libressl" ]
+}
