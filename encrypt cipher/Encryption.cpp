@@ -53,7 +53,7 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
 
 	outFile.close();
 
-    delete Data;
+    delete[] Data;
 
     return true;
 }
