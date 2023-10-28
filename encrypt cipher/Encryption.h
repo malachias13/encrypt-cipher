@@ -14,7 +14,7 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
-#define MAX_BUFFER_SIZE    512
+#define MAX_BUFFER_SIZE    2'151'205
 
 
 class Encryption

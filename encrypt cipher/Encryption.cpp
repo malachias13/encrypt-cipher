@@ -26,7 +26,7 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
     }
 
     inFile.close();
-    unsigned char Data[MAX_BUFFER_SIZE];
+    unsigned char* Data = new unsigned char[MAX_BUFFER_SIZE];
     memset(Data, '\0', MAX_BUFFER_SIZE);
 
     int Data_len = 0;
@@ -52,6 +52,9 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
 	}
 
 	outFile.close();
+
+    delete Data;
+
     return true;
 }
 
