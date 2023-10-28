@@ -1,14 +1,40 @@
 #pragma once
 
-#include<string>
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <memory>
 #include <list>
+
+#include <string.h>
+#include <sstream>
+
+#include <openssl/ssl.h>
+#include <openssl/evp.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+
+#define MAX_BUFFER_SIZE    512
+
 
 class Encryption
 {
 public:
-	static bool encryptFile(const std::string& filename, bool encrypt);
+	 bool encryptFile(const std::string& filename, bool bEncrypt);
+
+public:
+	Encryption();
+	// OpenSSL code.
+	int encrypt(unsigned char* plaintData, unsigned char* cipherData, int plainData_len = -1);
+	int decrypt(unsigned char* plainData, unsigned char* cipherData, int ciphertext_len);
+	void print_ciphertext(unsigned char* ciphertext, int ciphertext_len);
+
+	void setKey(unsigned char* _key);
+	~Encryption();
 
 private:
-	static bool perfromshift(std::list<unsigned char>& content, bool encrypt);
+	unsigned char* key;
+	unsigned char* iv;
+
 };
 

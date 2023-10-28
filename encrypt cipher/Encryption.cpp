@@ -3,9 +3,10 @@
 #include <cctype>
 #include <conio.h>
 #include <iostream>
+#include <vector>
 
 
-bool Encryption::encryptFile(const std::string& filename, bool encrypt)
+bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
 {
 
     // open file
@@ -13,46 +14,171 @@ bool Encryption::encryptFile(const std::string& filename, bool encrypt)
     if (!inFile) { return false; }
 
     // Read the content of the file
-    unsigned char data = 0;
-    std::list<unsigned char> content;
+    unsigned char byte = 0;
+    std::vector<unsigned char> content;
+   // std
 
     while (true) 
     {
-        inFile.read((char*)&data, sizeof(unsigned char));
+        inFile.read((char*)&byte, sizeof(unsigned char));
         if (inFile.eof()) { break; }
-        content.push_back(data);
+        content.push_back(byte);
     }
 
     inFile.close();
+    unsigned char Data[MAX_BUFFER_SIZE];
+    memset(Data, '\0', MAX_BUFFER_SIZE);
 
-    if (perfromshift(content, encrypt))
+    int Data_len = 0;
+
+    if (bEncrypt)
     {
-        // Write content to file.
-        std::ofstream outFile(filename, std::ios::trunc | std::ios::binary);
-        if (!outFile) { return false; }
+        Data_len = encrypt(content.data(), Data, content.size());
+    }
+    else {
 
-        for (unsigned char& ch : content)
-        {
-            outFile.write((const char*)&ch, sizeof(unsigned char));
-        }
-
-        outFile.close();
-
-        return true;
+        Data_len = decrypt(Data, content.data(), content.size());
     }
 
+    if (Data_len < 0) { return false; }
 
-    return false;
+	// Write content to file.
+	std::ofstream outFile(filename, std::ios::trunc | std::ios::binary);
+	if (!outFile) { return false; }
+
+	for (int i = 0; i < Data_len; i++)
+	{
+		outFile.write((const char*)&Data[i], sizeof(unsigned char));
+	}
+
+	outFile.close();
+    return true;
 }
 
-bool Encryption::perfromshift(std::list<unsigned char>& content, bool encrypt)
+Encryption::Encryption()
 {
-    int shift = encrypt ? 3 : -3;
+    key = (unsigned char*)"01234567890123456789012345678901"; // A 256 bit key 32 bytes
+    iv = (unsigned char*)"0123456789012345";                 // A 128 bit IV  16 bytes
+}
 
-    for (unsigned char& ch : content)
+int Encryption::encrypt(unsigned char* plaintData, unsigned char* cipherData, int plainData_len)
+{
+
+    EVP_CIPHER_CTX* ctx;
+    int len;
+    if (plainData_len == -1) {
+        plainData_len = strlen((char*)plaintData);
+    }
+    int cipherData_len;
+
+    /* Create and initialise the context */
+    if (!(ctx = EVP_CIPHER_CTX_new()))
     {
-        ch = static_cast<unsigned char>(ch + shift % 255);
+        std::cout << "encrypt: EVP_CIPHER_CTX_new() error" << std::endl;
+        return -1;
     }
 
-    return true;
+    /*
+    * Initialise the encryption operation
+    */
+       
+    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    {
+        std::cout << "encrypt: EVP_EncryptInit_ex() error" << std::endl;
+        return -1;
+    }
+
+    /*
+    * Provide the message to be encrypted, and obtain the encrypted output.
+    */
+
+    if (1 != EVP_EncryptUpdate(ctx, cipherData, &len, plaintData, plainData_len))
+    {
+        std::cout << "encrypt: EVP_EncryptUpdate() error" << std::endl;
+        return -1;
+    }
+
+    cipherData_len = len;
+
+    /*
+    * Finalise the encryption. Further cipherData bytes may be written at
+    * this stage.
+    */
+
+    if (1 != EVP_EncryptFinal_ex(ctx, cipherData + len, &len))
+    {
+        std::cout << "encrypt: EVP_EncryptFinal_ex() error" << std::endl;
+        return -1;
+    }
+
+    cipherData_len += len;
+
+    /* Clean up*/
+    EVP_CIPHER_CTX_free(ctx);
+
+    return cipherData_len;
+}
+
+int Encryption::decrypt(unsigned char* plainData, unsigned char* cipherData, int ciphertext_len)
+{
+    EVP_CIPHER_CTX* ctx;
+    int len;
+    int plainData_len;
+
+    /* Create and initialise the context */
+    if (!(ctx = EVP_CIPHER_CTX_new()))
+    {
+        std::cout << "decrypt: EVP_CIPHER_CTX_new error" << std::endl;
+        return -1;
+    }
+
+    /*
+    * Initialise the decryption operation.
+    */
+    if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)) 
+    {
+        std::cout << "decrypt: EVP_DecryptInit_ex() error" << std::endl;
+        return -1;
+    }
+
+    /*
+    * Provide the message to be decrypted, and obtain the plainData output.
+    */
+
+    if (1 != EVP_DecryptUpdate(ctx, plainData, &len, cipherData, ciphertext_len))
+    {
+        std::cout << "decrypt: EVP_DecryptUpdate() error" << std::endl;
+        return -1;
+    }
+    plainData_len = len;
+
+    /*
+    * Finalise the decryption.
+    */
+    if (1 != EVP_DecryptFinal_ex(ctx, plainData + len, &len)) 
+    {
+        std::cout << "decrypt: EVP_DecryptFinal_ex() error" << std::endl;
+        return -1;
+    }
+    plainData_len += len;
+
+    /* Clean up */
+    EVP_CIPHER_CTX_free(ctx);
+
+    return plainData_len;
+}
+
+void Encryption::print_ciphertext(unsigned char* ciphertext, int ciphertext_len)
+{
+    printf("Ciphertext is:\n");
+    BIO_dump_fp(stdout, (const char*)ciphertext, ciphertext_len);
+}
+
+void Encryption::setKey(unsigned char* _key)
+{
+    key = _key;
+}
+
+Encryption::~Encryption()
+{
 }
