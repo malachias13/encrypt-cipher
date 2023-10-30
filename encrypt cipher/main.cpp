@@ -3,6 +3,9 @@
 #include <stdlib.h> 
 
 #include "Encryption.h"
+#include "FileManagerZ.h"
+
+void HandleDisplayMessage(const std::string& filename, bool isEncrypting, bool isSuccessful);
 
 int main()
 {
@@ -10,10 +13,13 @@ int main()
 	std::string filename;
 	std::string key;
 	bool Encrypt = false;
+	std::vector<std::string> blackListedFolders{"Web"};
 
 	while (true)
 	{
 		Encryption enObject = Encryption();
+
+		FileManagerZ filemanager(blackListedFolders);
 
 		std::cout << "Encrypt: (1) Decrypt: (2) Exit: (3)" << std::endl;
 		int value;
@@ -23,7 +29,7 @@ int main()
 		else if (value == 2) { Encrypt = false; }
 		else { break; }
 
-		std::cout << "Enter the filename." << std::endl;
+		std::cout << "Enter the filename or folder." << std::endl;
 		std::getline(std::cin >> std::ws, filename);
 		std::cout << std::endl;
 
@@ -34,28 +40,43 @@ int main()
 
 		enObject.setKey((unsigned char*)key.c_str());
 
-		if (Encrypt)
+		if (!filemanager.IsFile(filename.c_str()))
 		{
-			if (enObject.encryptFile(filename, true))
+			filemanager.ReadFilesInFolder(filename.c_str());
+			for (int i = 0; i < filemanager.GetFiles().size(); i++)
 			{
-				std::cout << "Encryption compleated successfully." << std::endl;
-			}
-			else {
-				std::cerr << "Error: Unable to perfrom encryption." << std::endl;
+				bool succeed = enObject.encryptFile(filemanager.GetFiles()[i], Encrypt);
+				HandleDisplayMessage(filemanager.GetFiles()[i], Encrypt, succeed);
 			}
 		}
 		else {
-			if (enObject.encryptFile(filename, false))
-			{
-				std::cout << "Decryption compleated successfully." << std::endl;
-			}
-			else {
-				std::cerr << "Error: Unable to perfrom decryption." << std::endl;
-			}
+			bool succeed = enObject.encryptFile(filename, Encrypt);
+			HandleDisplayMessage(filename, Encrypt, succeed);
 		}
+		
 		key = std::string::npos;
 		std::cout << std::endl;
 	}
 
 	return 0;
+}
+
+void HandleDisplayMessage(const std::string& filename, bool isEncrypting, bool isSuccessful)
+{
+	if (isSuccessful)
+	{
+		/* Error handling */
+		if (isEncrypting)
+			std::cout << filename << "-> Encryption compleated successfully." << std::endl;
+		else
+			std::cout << filename << "-> Decryption compleated successfully." << std::endl;
+
+	}
+	else {
+		/* Error handling */
+		if (isEncrypting)
+			std::cerr << filename << "-> Error: Unable to perfrom encryption." << std::endl;
+		else
+			std::cerr << filename << "-> Error: Unable to perfrom encryption." << std::endl;
+	}
 }

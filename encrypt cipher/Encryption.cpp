@@ -12,6 +12,7 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
     // open file
     std::ifstream inFile(filename, std::ios::binary);
     if (!inFile) { return false; }
+    if (!inFile.is_open()) { inFile.open(filename); }
 
     // Read the content of the file
     unsigned char byte = 0;
