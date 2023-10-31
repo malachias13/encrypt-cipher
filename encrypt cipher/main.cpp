@@ -77,6 +77,6 @@ void HandleDisplayMessage(const std::string& filename, bool isEncrypting, bool i
 		if (isEncrypting)
 			std::cerr << filename << "-> Error: Unable to perfrom encryption." << std::endl;
 		else
-			std::cerr << filename << "-> Error: Unable to perfrom encryption." << std::endl;
+			std::cerr << filename << "-> Error: Unable to perfrom Decryption." << std::endl;
 	}
 }
