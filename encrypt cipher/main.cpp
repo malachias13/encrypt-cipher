@@ -13,7 +13,7 @@ int main()
 	std::string filename;
 	std::string key;
 	bool Encrypt = false;
-	std::vector<std::string> blackListedFolders{"Web"};
+	std::vector<std::string> blackListedFolders{"Windows","C:","System32"};
 
 	while (true)
 	{

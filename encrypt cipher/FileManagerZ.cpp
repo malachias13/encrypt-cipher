@@ -1,6 +1,7 @@
 #include "FileManagerZ.h"
 #include <string>
 #include <fstream>
+#include <iostream>
 
 
 FileManagerZ::FileManagerZ(std::vector<std::string> blackListedFolders)
@@ -11,17 +12,20 @@ FileManagerZ::FileManagerZ(std::vector<std::string> blackListedFolders)
 void FileManagerZ::ReadFilesInFolder(const char* folder)
 {
 	namespace fs = std::filesystem;
-
+	bool isBlacklisted = false;
 	for (const auto& entry : fs::directory_iterator(folder))
 	{
 		if(!IsFile(entry.path().generic_string().c_str())){ continue; }
 		for (int i = 0; i < BlackListedFolders.size(); i++)
 		{
-			if (entry.path().parent_path() != BlackListedFolders[i])
-			{ 
-				Files.push_back(entry.path().generic_string());
+			if (isBlacklisted = entry.path().parent_path().filename() != BlackListedFolders[i]) { continue; }
+			else {
+				std::cout << entry.path().parent_path().filename() << "is a blacklisted Folder." << std::endl;
+				break;
 			}
 		}
+		if(isBlacklisted == true)
+			Files.push_back(entry.path().generic_string());
 	}
 }
 
