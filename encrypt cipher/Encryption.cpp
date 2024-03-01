@@ -3,10 +3,9 @@
 #include <vector>
 #include <random>
 #include <string>
+#include <array>
 
-
-
-bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
+bool Encryption::encryptFile_s(const std::string& filename, bool bEncrypt)
 {
 
     // open file
@@ -17,9 +16,9 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
     // Read the content of the file
     unsigned char byte = 0;
     std::vector<unsigned char> content;
-   // std
+    // std
 
-    while (true) 
+    while (true)
     {
         inFile.read((char*)&byte, sizeof(unsigned char));
         if (inFile.eof()) { break; }
@@ -27,37 +26,36 @@ bool Encryption::encryptFile(const std::string& filename, bool bEncrypt)
     }
 
     inFile.close();
-    unsigned char* Data = new unsigned char[MAX_BUFFER_SIZE];
-    memset(Data, '\0', MAX_BUFFER_SIZE);
+    std::vector<unsigned char> Data(MAX_BUFFER_SIZE,'\0');
 
     int Data_len = 0;
 
     if (bEncrypt)
     {
-        Data_len = encrypt(content.data(), Data, content.size());
+        Data_len = encrypt(content.data(), Data.data(), content.size());
     }
     else {
 
-        Data_len = decrypt(Data, content.data(), content.size());
+        Data_len = decrypt(Data.data(), content.data(), content.size());
     }
 
     if (Data_len < 0) { return false; }
 
-	// Write content to file.
-	std::ofstream outFile(filename, std::ios::trunc | std::ios::binary);
-	if (!outFile) { return false; }
+    // Write content to file.
+    std::ofstream outFile(filename, std::ios::trunc | std::ios::binary);
+    if (!outFile) { return false; }
 
-	for (int i = 0; i < Data_len; i++)
-	{
-		outFile.write((const char*)&Data[i], sizeof(unsigned char));
-	}
+    for (int i = 0; i < Data_len; i++)
+    {
+        outFile.write((const char*)&Data[i], sizeof(unsigned char));
+    }
 
-	outFile.close();
-
-    delete[] Data;
+    outFile.close();
 
     return true;
 }
+
+
 
 Encryption::Encryption()
 {

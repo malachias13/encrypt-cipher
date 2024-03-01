@@ -19,7 +19,7 @@
 class Encryption
 {
 public:
-	 bool encryptFile(const std::string& filename, bool bEncrypt);
+	 bool encryptFile_s(const std::string& filename, bool bEncrypt);
 
 public:
 	Encryption();

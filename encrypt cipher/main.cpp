@@ -45,16 +45,16 @@ int main()
 			filemanager.ReadFilesInFolder(filename.c_str());
 			for (int i = 0; i < filemanager.GetFiles().size(); i++)
 			{
-				bool succeed = enObject.encryptFile(filemanager.GetFiles()[i], Encrypt);
+				bool succeed = enObject.encryptFile_s(filemanager.GetFiles()[i], Encrypt);
 				HandleDisplayMessage(filemanager.GetFiles()[i], Encrypt, succeed);
 			}
 		}
 		else {
-			bool succeed = enObject.encryptFile(filename, Encrypt);
+			bool succeed = enObject.encryptFile_s(filename, Encrypt);
 			HandleDisplayMessage(filename, Encrypt, succeed);
 		}
 		
-		key = std::string::npos;
+		key = "";
 		std::cout << std::endl;
 	}
 
